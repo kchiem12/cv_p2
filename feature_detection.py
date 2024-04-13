@@ -49,7 +49,7 @@ def computeHarrisValues(srcImage):
         # orientation for each pixel and store it in 'orientationImage.'
         # TODO-BLOCK-BEGIN
 
-
+        raise NotImplementedError("TODO Unimplemented")
 
         
         # TODO-BLOCK-END
@@ -152,7 +152,16 @@ def computeMOPSDescriptors(image, features):
         # Note: use grayImage to compute features on, not the input image
         # TODO-BLOCK-BEGIN
 
-        raise NotImplementedError("TODO Unimplemented")
+        x, y, orient = f[0], f[1], f[2]
+
+         # calculate the transformation matrix components
+        t1 = transformations.get_trans_mx(np.array([-x, -y, 0]))[:2, :3]
+        r = transformations.get_rot_mx(0, 0, -orient)[:2, :2]
+        s = transformations.get_scale_mx(0.2, 0.2, 1)[:2, :2]
+        t2 = transformations.get_trans_mx(np.array([windowSize / 2, windowSize / 2, 0]))[:2, :3]
+
+        transMx = np.dot(t2, np.dot(s, np.dot(r, t1)))
+
         # TODO-BLOCK-END
 
         # Call the warp affine function to do the mapping
