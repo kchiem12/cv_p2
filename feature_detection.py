@@ -185,9 +185,7 @@ def computeMOPSDescriptors(image, features):
 def produceMatches(desc_img1, desc_img2):
     """
     Input:
-        corners_img1 -- list of corners produced by detectCorners on image 1
         desc_img1 -- corresponding set of MOPS descriptors for image 1
-        corners_img2 -- list of corners produced by detectCorners on image 2
         desc_img2 -- corresponding set of MOPS descriptors for image 2
 
     Output:
@@ -217,7 +215,36 @@ def produceMatches(desc_img1, desc_img2):
     # Note: multiple features from the first image may match the same
     # feature in the second image.
     # TODO-BLOCK-BEGIN
-    raise NotImplementedError("TODO Unimplemented")
+    
+    # get the pairwise distances between descriptors from both imgs
+    dists = spatial.distance.cdist(desc_img1, desc_img2, 'sqeuclidean')
+
+
+    # iterate over the first images descriptors
+    for idx1, dists1 in enumerate(dists):
+         
+        if len(dists1) < 2:
+            continue
+         
+        # get the two smallest distances
+        sorted_dists = np.argsort(dists1)
+        best_dist1 = sorted_dists[0]
+        best_dist2 = sorted_dists[1]
+
+        if dists1[best_dist1] < 1e-5:
+            dists1[best_dist1] = 1
+
+        if dists1[best_dist2] < 1e-5:
+            dists1[best_dist2] = 1
+        
+
+        # calculate the ratio
+        ratio = dists1[best_dist1] / dists1[best_dist2]
+
+        # add to the match
+        matches.append((idx1, best_dist1, ratio))
+
+
     # TODO-BLOCK-END
 
     return matches

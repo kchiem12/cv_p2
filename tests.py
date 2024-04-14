@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from feature_detection import computeHarrisValues, detectCorners, computeMOPSDescriptors, computeLocalMaximaHelper
+from feature_detection import computeHarrisValues, detectCorners, computeMOPSDescriptors, computeLocalMaximaHelper, produceMatches
 import traceback
 
 from PIL import Image
@@ -23,6 +23,13 @@ def unpickle_cv2(arr):
 # Functions for testing elementwise correctness
 def compare_array(arr1, arr2):
     return np.allclose(arr1,arr2,rtol=1e-3,atol=1e-3)
+
+def compare_matches(expected, actual):
+    if len(expected) != len(actual):
+        return False
+    if expected[0] != actual[0] or expected[1] != actual[1] or not np.isclose(expected[2], actual[2], atol=1e-3):
+        return False
+    return True
 
 def compare_cv2_points(pnt1, pnt2):
     if not np.isclose(pnt1[0],pnt2[0],rtol=1e-3,atol=1e-5): return False
@@ -54,6 +61,7 @@ def try_this(todo, run, truth, compare, *args, **kargs):
         return
     if type(output) is list or type(output) is tuple:
         for i in range(len(output)):
+            print("OUTPUT: ", output[i])
             if not compare(output[i], truth[i], **kargs):
                 print("TODO {} doesn't pass test: {}".format(todo, i))
                 failed+=1
@@ -103,3 +111,21 @@ try_this(2, computeLocalMaximaHelper, loaded['c'], compare_array, loaded['a'])
 try_this(3, detectCorners, d, compare_cv2_points, loaded['a'], loaded['b'])
 
 try_this('4 and/or 5', computeMOPSDescriptors, loaded['f'], compare_array, image, d)
+
+# tets for todo 6
+
+todo6_expected = [(0, 0, 1.0), (1, 1, 1.0), (2, 0, np.inf)]
+
+desc_img1 = np.array([
+    [1.0, 2.0, 3.0, 4.0],
+    [2.0, 3.0, 4.0, 5.0],
+    [0.1, 0.2, 0.3, 0.4]
+])
+
+desc_img2 = np.array([
+    [1.0, 2.0, 3.0, 4.0],
+    [2.0, 3.0, 4.0, 5.0],
+    [9.0, 10.0, 11.0, 12.0]
+])
+
+try_this(6, produceMatches, todo6_expected, compare_matches, desc_img1, desc_img2)
