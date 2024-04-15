@@ -189,16 +189,22 @@ def computeMOPSDescriptors(image, features):
         # Note: use grayImage to compute features on, not the input image
         # TODO-BLOCK-BEGIN
 
-        x, y, orient = f[0], f[1], f[2]
+        x, y, orient = f[0], f[1], math.radians(f[2])
 
         # calculate the transformation matrix components
-        t1 = transformations.get_trans_mx(np.array([-x, -y, 0]))[:2, :3]
-        r = transformations.get_rot_mx(0, 0, -orient)[:2, :2]
-        s = transformations.get_scale_mx(0.2, 0.2, 1)[:2, :2]
+        t1 = transformations.get_trans_mx(np.array([-x, -y, 0]))
+        r = transformations.get_rot_mx(0, 0, -orient)
+        s = transformations.get_scale_mx(0.2, 0.2, 1)
         t2 = transformations.get_trans_mx(
-            np.array([windowSize / 2, windowSize / 2, 0]))[:2, :3]
+            np.array([windowSize / 2, windowSize / 2, 0]))
 
-        transMx = np.dot(t2, np.dot(s, np.dot(r, t1)))
+        transf = np.dot(t2, np.dot(s, np.dot(r, t1)))
+
+        # remove the last two rows and the third column from the transformation matrix
+
+        transMx[:2, 2] = transf[:2, 3]
+
+        transMx[:2, :2] = transf[:2, :2]
 
         # TODO-BLOCK-END
 
