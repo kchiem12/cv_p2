@@ -61,8 +61,8 @@ def try_this(todo, run, truth, compare, *args, **kargs):
         return
     if type(output) is list or type(output) is tuple:
         for i in range(len(output)):
-            print("OUTPUT: ", output[i])
             if not compare(output[i], truth[i], **kargs):
+                print("Output: ", output[i])
                 print("TODO {} doesn't pass test: {}".format(todo, i))
                 failed+=1
     else:
@@ -112,20 +112,17 @@ try_this(3, detectCorners, d, compare_cv2_points, loaded['a'], loaded['b'])
 
 try_this('4 and/or 5', computeMOPSDescriptors, loaded['f'], compare_array, image, d)
 
-# tets for todo 6
+#  tests for todo 6
 
-todo6_expected = [(0, 0, 1.0), (1, 1, 1.0), (2, 0, np.inf)]
+# PERFECT MATCHES
+desc_img1 = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+desc_img2 = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+todo6_expected1 = [(0, 0, 0), (1, 1, 0), (2, 2, 0)]
 
-desc_img1 = np.array([
-    [1.0, 2.0, 3.0, 4.0],
-    [2.0, 3.0, 4.0, 5.0],
-    [0.1, 0.2, 0.3, 0.4]
-])
+# CLOSE MATCHES
+desc_img3 = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+desc_img4 = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 10]])
+todo6_expected2 = [(0, 0, 0), (1, 1, 0), (2, 2, 0.99)]
 
-desc_img2 = np.array([
-    [1.0, 2.0, 3.0, 4.0],
-    [2.0, 3.0, 4.0, 5.0],
-    [9.0, 10.0, 11.0, 12.0]
-])
+try_this(6, produceMatches, todo6_expected2, compare_matches, desc_img3, desc_img4)
 
-try_this(6, produceMatches, todo6_expected, compare_matches, desc_img1, desc_img2)

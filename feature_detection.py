@@ -1,5 +1,4 @@
 import math
-
 import cv2
 import numpy as np
 import scipy
@@ -291,7 +290,7 @@ def produceMatches(desc_img1, desc_img2):
             # set the minimum distance back to the original value
             dists[i][min_idx1] = min_dist1
 
-            if min_dist1 < 1e-5:
+            if min_dist2 < 1e-5:
                 distance = 1.0
             else:
                 distance = min_dist1 / min_dist2
