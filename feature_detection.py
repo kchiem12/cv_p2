@@ -269,27 +269,34 @@ def produceMatches(desc_img1, desc_img2):
     dists = spatial.distance.cdist(desc_img1, desc_img2, 'sqeuclidean')
 
     # iterate over the first images descriptors
-    for idx1, dists1 in enumerate(dists):
+    for i in range(dists.shape[0]):
 
-        if len(dists1) < 2:
-            continue
+        if len(dists[i]) < 2:
+            matches.append((i, 0, 0))
+        else:
 
-        # get the two smallest distances
-        sorted_dists = np.argsort(dists1)
-        best_dist1 = sorted_dists[0]
-        best_dist2 = sorted_dists[1]
+            distance = 0
 
-        if dists1[best_dist1] < 1e-5:
-            dists1[best_dist1] = 1
+            # find the minimum distance of the index
+            min_idx1 = np.argmin(dists[i])
+            min_dist1 = dists[i][min_idx1]
 
-        if dists1[best_dist2] < 1e-5:
-            dists1[best_dist2] = 1
+            # temporarily set the minimum distance to a large number
+            dists[i][min_idx1] = np.inf
 
-        # calculate the ratio
-        ratio = dists1[best_dist1] / dists1[best_dist2]
+            # find the second minimum distance of the index
+            min_idx2 = np.argmin(dists[i])
+            min_dist2 = dists[i][min_idx2]
 
-        # add to the match
-        matches.append((idx1, best_dist1, ratio))
+            # set the minimum distance back to the original value
+            dists[i][min_idx1] = min_dist1
+
+            if min_dist1 < 1e-5:
+                distance = 1.0
+            else:
+                distance = min_dist1 / min_dist2
+
+            matches.append((i, min_idx1, distance))
 
     # TODO-BLOCK-END
 
